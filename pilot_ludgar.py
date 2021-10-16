@@ -84,9 +84,6 @@ def ieee_754_conversion(n, sgn_len=1, exp_len=8, mant_len=23):
     return sign_mult * (2 ** exponent) * mant_mult
 
 
-
-
-
 def OPC_connection():
     opc.close()
     try:
@@ -183,8 +180,6 @@ while(1):
                         wBatchSizeWORD= list(bytes(da_promena))[8:10]
                         print(merge_byte(wBatchSizeWORD))
 
-
-
                     if tag == "aBLCfgWasher[1].aDosingPoint[17]":
                         aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE = list_tag[0]
                         aBLCfgWasheraDosingPointbyTargetBYTE = list_tag[1]
@@ -211,8 +206,10 @@ while(1):
                         aBLDosageDatabyVisuState = list_tag[14:16]
                         print(merge_byte(aBLDosageDatabyVisuState))
 
-
+        ###todo automaticé obnovování když to spadne
+        #muže othle vubec nasatat
         else:
+
             print("da_promena: ",da_promena)
             print(str(tag), da_promena)
             x = (da_promena)
@@ -226,8 +223,6 @@ while(1):
             print("watch dog  : ",watch_dog)
             if watch_dog == 1:
                 test = opc.properties(str(tag), id=2)
-
-
 
 
 
