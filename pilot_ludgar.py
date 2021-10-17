@@ -5,6 +5,7 @@ import json
 import csv
 import redis
 import struct
+import redis_migrate
 
 #*******************************************************************
 num_machine = 2
@@ -173,9 +174,10 @@ while(1):
                     # print("xXOOOOOOOOOOOOOOOOOX memori view")
 
                     redis_list = []
+                    redis_list.append(tag)
                     if tag[0:23] == "DF02_CL01..aBLBatchData":
                         print("done")
-                        redis_list.append(tag)
+
                         byProgBYTE = list(bytes(da_promena))[0]
                         print(byProgBYTE)
 
@@ -192,37 +194,55 @@ while(1):
                         redis_list.append({"byStepBYTE":byStepBYTE})
                         redis_list.append({"dwCustomerDWORD":merge_byte(dwCustomerDWORD)})
                         redis_list.append({"wBatchSizeWORD":merge_byte(wBatchSizeWORD)})
-                        print(redis_list)
+
 
                         store_to_redis(redis_list)
 
                     if tag[0:23] == "DF02_CL01..aBLCfgWasher":
                         print("done")
-                        # aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE = list_tag[0]
-                        # aBLCfgWasheraDosingPointbyTargetBYTE = list_tag[1]
-                        # aBLCfgWasheraDosingPointxEnabledBOOL = list_tag[2]
+                        aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE = list_tag[0]
+                        aBLCfgWasheraDosingPointbyTargetBYTE = list_tag[1]
+                        aBLCfgWasheraDosingPointxEnabledBOOL = list_tag[2]
 
+                        redis_list.append({"aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE": aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE})
+                        redis_list.append({"aBLCfgWasheraDosingPointbyTargetBYTE": aBLCfgWasheraDosingPointbyTargetBYTE})
+                        redis_list.append({"aBLCfgWasheraDosingPointxEnabledBOOL": aBLCfgWasheraDosingPointxEnabledBOOL})
+                        store_to_redis(redis_list)
 
                     if tag[0:24] == "DF02_CL01..aBLDosageData":
                         print("done")
-                        # aBLDosageDatarSetPoint= list_tag[0:4]
-                        # print("merge_byte",( merge_byte(aBLDosageDatarSetPoint)))
-                        # xx = merge_byte(aBLDosageDatarSetPoint)
-                        #
-                        # f = int(str(xx), 10)
-                        # print(struct.unpack('f', struct.pack('I', f))[0])
-                        #
-                        # aBLDosageDatarActualValue= list_tag[4:8]
-                        # print(merge_byte(aBLDosageDatarActualValue))
-                        #
-                        # aBLDosageDatadtTimeStamp= list_tag[8:12]
-                        # print(merge_byte(aBLDosageDatadtTimeStamp))
-                        #
-                        # aBLDosageDatabyErrorState= list_tag[12]
-                        # print((aBLDosageDatabyErrorState))
-                        #
-                        # aBLDosageDatabyVisuState = list_tag[14:16]
-                        # print(merge_byte(aBLDosageDatabyVisuState))
+
+                        aBLDosageDatarSetPoint= list_tag[0:4]
+                        print("merge_byte",( merge_byte(aBLDosageDatarSetPoint)))
+                        xx = merge_byte(aBLDosageDatarSetPoint)
+
+
+                        #převod na float podle standatru nejde poslat do json
+                        f = int(str(xx), 10)
+                        ff=(struct.unpack('f', struct.pack('I', f))[0])
+
+                        print(struct.unpack('f', struct.pack('I', f))[0])
+                        aBLDosageDatarActualValue= list_tag[4:8]
+                        print(merge_byte(aBLDosageDatarActualValue))
+
+                        aBLDosageDatadtTimeStamp= list_tag[8:12]
+                        print("aBLDosageDatadtTimeStamp",merge_byte(aBLDosageDatadtTimeStamp))
+                        print(type(merge_byte(aBLDosageDatadtTimeStamp)))
+
+                        aBLDosageDatabyErrorState= list_tag[12]
+                        print((aBLDosageDatabyErrorState))
+
+                        aBLDosageDatabyVisuState = list_tag[14:16]
+                        print(merge_byte(aBLDosageDatabyVisuState))
+
+                        redis_list.append({"aBLDosageDatarSetPoint": (ff)})
+                        redis_list.append({"aBLDosageDatarActualValue": merge_byte(aBLDosageDatarActualValue)})
+                        redis_list.append({"aBLDosageDatadtTimeStamp": merge_byte(aBLDosageDatadtTimeStamp)})
+                        redis_list.append({"aBLDosageDatabyErrorState": aBLDosageDatabyErrorState})
+                        redis_list.append({"aBLDosageDatabyVisuState": merge_byte(aBLDosageDatabyVisuState)})
+                        store_to_redis(redis_list)
+
+
 
         ###todo automaticé obnovování když to spadne
         #muže othle vubec nasatat
@@ -271,5 +291,14 @@ while(1):
     # else:
     #     print(opc.read("DF02_CL01..byPCHeartbeat"))
     #     opc.write(("DF02_CL01..byPCHeartbeat", 0))
+    redis_server = redis_connenction()
+    for key in redis_server.scan_iter("*"):
+        # delete the key
+        print(key)
+        r_migrate =(redis_server.get(key))
+        print(r_migrate)
+
+        # redis_server.delete(key)
+
     quit()
     time.sleep(1)
