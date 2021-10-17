@@ -30,18 +30,23 @@ def give_me_tags():
     for n in range(num_machine):
         WasherState = OPC_list+".."+"adwWasherState["+str(n+1)+"]"
         tags_WasherState.append(WasherState)
+
         PcState = OPC_list+".."+"adwPCState["+str(n+1)+"]"
         tags_PcState.append(PcState)
+
         PcState = OPC_list + ".." + "aBLBatchData[" + str(n + 1) + "]"
         tags_PcState.append(PcState)
+
         for m in range(num_dosing_point):
             PcState = OPC_list + ".." + "aBLCfgWasher[" + str(n + 1) + "].aDosingPoint["+str(m+1)+"]"
             tags_PcState.append(PcState)
         PcState = OPC_list + ".." + "aBLBatchData[" + str(n + 1) + "]"
         tags_PcState.append(PcState)
 
-        PcState = OPC_list + ".." + "aBLDosageData[1,8]"
-        tags_PcState.append(PcState)
+    for m in range(1,3):
+        for x in range(1,21):
+            PcState = OPC_list + ".." + "aBLDosageData["+str(m)+","+str(x)+"]"
+            tags_PcState.append(PcState)
 
 def ieee_754_conversion(n, sgn_len=1, exp_len=8, mant_len=23):
     """
@@ -156,73 +161,81 @@ while(1):
             time.sleep(3)
 
     for tag in tags_PcState:
-        print(tag)
+        print("tag: ",tag)
         da_promena = opc.properties(str(tag), id=2)
 
         whod_is = type(da_promena)
         if whod_is == memoryview:
-                    print((bytearray(da_promena)))
-                    print((bytes(da_promena)))
-                    print(list(bytes(da_promena)))
+                    # print((bytearray(da_promena)))
+                    # print((bytes(da_promena)))
+                    # print(list(bytes(da_promena)))
                     list_tag = list(bytes(da_promena))
-                    print("xXOOOOOOOOOOOOOOOOOX memori view")
+                    # print("xXOOOOOOOOOOOOOOOOOX memori view")
 
-                    if tag == "DF02_CL01..aBLBatchData[2]":
-                        byProgBYTE = list(bytes(da_promena))[0]
-                        print(byProgBYTE)
+                    print("krátky tag: ",tag[0:23])
 
-                        byStepBYTE = list(bytes(da_promena))[1]
-                        print(byStepBYTE)
+                    if tag[0:23] == "DF02_CL01..aBLBatchData":
+                        print("done")
+                        # byProgBYTE = list(bytes(da_promena))[0]
+                        # print(byProgBYTE)
+                        #
+                        # byStepBYTE = list(bytes(da_promena))[1]
+                        # print(byStepBYTE)
+                        #
+                        # dwCustomerDWORD = list(bytes(da_promena))[4:8]
+                        # print(merge_byte(dwCustomerDWORD))
+                        #
+                        # wBatchSizeWORD= list(bytes(da_promena))[8:10]
+                        # print(merge_byte(wBatchSizeWORD))
 
-                        dwCustomerDWORD = list(bytes(da_promena))[4:8]
-                        print(merge_byte(dwCustomerDWORD))
-
-                        wBatchSizeWORD= list(bytes(da_promena))[8:10]
-                        print(merge_byte(wBatchSizeWORD))
-
-                    if tag == "aBLCfgWasher[1].aDosingPoint[17]":
-                        aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE = list_tag[0]
-                        aBLCfgWasheraDosingPointbyTargetBYTE = list_tag[1]
-                        aBLCfgWasheraDosingPointxEnabledBOOL = list_tag[2]
+                    if tag[0:23] == "DF02_CL01..aBLCfgWasher":
+                        print("done")
+                        # aBLCfgWasheraDosingPointbyLowLevelAlarmBYTE = list_tag[0]
+                        # aBLCfgWasheraDosingPointbyTargetBYTE = list_tag[1]
+                        # aBLCfgWasheraDosingPointxEnabledBOOL = list_tag[2]
 
 
-                    if tag == "DF02_CL01..aBLDosageData[1,8]":
-                        aBLDosageDatarSetPoint= list_tag[0:4]
-                        print("merge_byte",( merge_byte(aBLDosageDatarSetPoint)))
-                        xx = merge_byte(aBLDosageDatarSetPoint)
-
-                        f = int(str(xx), 10)
-                        print(struct.unpack('f', struct.pack('I', f))[0])
-
-                        aBLDosageDatarActualValue= list_tag[4:8]
-                        print(merge_byte(aBLDosageDatarActualValue))
-
-                        aBLDosageDatadtTimeStamp= list_tag[8:12]
-                        print(merge_byte(aBLDosageDatadtTimeStamp))
-
-                        aBLDosageDatabyErrorState= list_tag[12]
-                        print((aBLDosageDatabyErrorState))
-
-                        aBLDosageDatabyVisuState = list_tag[14:16]
-                        print(merge_byte(aBLDosageDatabyVisuState))
+                    if tag[0:24] == "DF02_CL01..aBLDosageData":
+                        print("done")
+                        # aBLDosageDatarSetPoint= list_tag[0:4]
+                        # print("merge_byte",( merge_byte(aBLDosageDatarSetPoint)))
+                        # xx = merge_byte(aBLDosageDatarSetPoint)
+                        #
+                        # f = int(str(xx), 10)
+                        # print(struct.unpack('f', struct.pack('I', f))[0])
+                        #
+                        # aBLDosageDatarActualValue= list_tag[4:8]
+                        # print(merge_byte(aBLDosageDatarActualValue))
+                        #
+                        # aBLDosageDatadtTimeStamp= list_tag[8:12]
+                        # print(merge_byte(aBLDosageDatadtTimeStamp))
+                        #
+                        # aBLDosageDatabyErrorState= list_tag[12]
+                        # print((aBLDosageDatabyErrorState))
+                        #
+                        # aBLDosageDatabyVisuState = list_tag[14:16]
+                        # print(merge_byte(aBLDosageDatabyVisuState))
 
         ###todo automaticé obnovování když to spadne
         #muže othle vubec nasatat
         else:
+            pass
+            # nevím k čemu tohle je
 
-            print("da_promena: ",da_promena)
-            print(str(tag), da_promena)
-            x = (da_promena)
-            print("data type ",type(da_promena))
-            by = bytearray(struct.pack("f", da_promena))
-            b = ((bin(int.from_bytes(by, byteorder="little"))).strip("0b"))
-            x = 32 - len(b)
-            b = x * "0" + str(b)
-            watch_dog = b[-2]
-            print(b)
-            print("watch dog  : ",watch_dog)
-            if watch_dog == 1:
-                test = opc.properties(str(tag), id=2)
+
+            # # print("da_promena: ",da_promena)
+            # # print(str(tag), da_promena)
+            # x = (da_promena)
+            # # print("data type ",type(da_promena))
+            # by = bytearray(struct.pack("f", da_promena))
+            # b = ((bin(int.from_bytes(by, byteorder="little"))).strip("0b"))
+            # x = 32 - len(b)
+            # b = x * "0" + str(b)
+            # watch_dog = b[-2]
+            # # print(b)
+            # # print("watch dog  : ",watch_dog)
+            # if watch_dog == 1:
+            #     test = opc.properties(str(tag), id=2)
 
 
 
