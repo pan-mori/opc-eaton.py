@@ -129,7 +129,7 @@ def merge_byte(byteA):
 
 def redis_connenction():
     try:
-        r_pump = redis.StrictRedis(host='127.0.0.1', port=6379, db=1)
+        r_pump = redis.StrictRedis(host='127.0.0.1', port=6379, db=2)
         print (r_pump)
 
         r_pump.ping()
@@ -161,7 +161,7 @@ while(1):
             time.sleep(3)
 
     for tag in tags_PcState:
-        print("tag: ",tag)
+        # print("tag: ",tag)
         da_promena = opc.properties(str(tag), id=2)
 
         whod_is = type(da_promena)
@@ -172,21 +172,29 @@ while(1):
                     list_tag = list(bytes(da_promena))
                     # print("xXOOOOOOOOOOOOOOOOOX memori view")
 
-                    print("krátky tag: ",tag[0:23])
-
+                    redis_list = []
                     if tag[0:23] == "DF02_CL01..aBLBatchData":
                         print("done")
-                        # byProgBYTE = list(bytes(da_promena))[0]
-                        # print(byProgBYTE)
-                        #
-                        # byStepBYTE = list(bytes(da_promena))[1]
-                        # print(byStepBYTE)
-                        #
-                        # dwCustomerDWORD = list(bytes(da_promena))[4:8]
-                        # print(merge_byte(dwCustomerDWORD))
-                        #
-                        # wBatchSizeWORD= list(bytes(da_promena))[8:10]
-                        # print(merge_byte(wBatchSizeWORD))
+                        redis_list.append(tag)
+                        byProgBYTE = list(bytes(da_promena))[0]
+                        print(byProgBYTE)
+
+                        byStepBYTE = list(bytes(da_promena))[1]
+                        print(byStepBYTE)
+
+                        dwCustomerDWORD = list(bytes(da_promena))[4:8]
+                        print(merge_byte(dwCustomerDWORD))
+
+                        wBatchSizeWORD= list(bytes(da_promena))[8:10]
+                        print(merge_byte(wBatchSizeWORD))
+
+                        redis_list.append({"byProgBYTE":byProgBYTE})
+                        redis_list.append({"byStepBYTE":byStepBYTE})
+                        redis_list.append({"dwCustomerDWORD":merge_byte(dwCustomerDWORD)})
+                        redis_list.append({"wBatchSizeWORD":merge_byte(wBatchSizeWORD)})
+                        print(redis_list)
+
+                        store_to_redis(redis_list)
 
                     if tag[0:23] == "DF02_CL01..aBLCfgWasher":
                         print("done")
