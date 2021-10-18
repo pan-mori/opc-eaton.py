@@ -291,14 +291,7 @@ while(1):
     # else:
     #     print(opc.read("DF02_CL01..byPCHeartbeat"))
     #     opc.write(("DF02_CL01..byPCHeartbeat", 0))
-    redis_server = redis_connenction()
-    for key in redis_server.scan_iter("*"):
-        # delete the key
-        print(key)
-        r_migrate =(redis_server.get(key))
-        print(r_migrate)
 
-        # redis_server.delete(key)
 
     quit()
     time.sleep(1)
