@@ -8,6 +8,7 @@ json_body = [
     {
         "measurement": "brushEvents",
         "tags": {
+            "x":"xoxox?",
             "user": "Carol",
             "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
         },
